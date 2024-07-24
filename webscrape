@@ -1,0 +1,94 @@
+#===============================================================
+#Name: Dylan Fischer
+#
+#Program Description: Webscrape automation to find interesting articles about hacking
+#=================================================================
+
+import math
+import cloudscraper
+import requests
+from bs4 import BeautifulSoup
+
+#Scrapper with bot bypass
+scraper = cloudscraper.create_scraper(browser={'browser': 'chrome','platform': 'windows','mobile': False})
+
+#Normal webpage request
+#webpage = requests.get("https://www.bleepingcomputer.com")
+html = scraper.get("https://www.bleepingcomputer.com").content
+
+# Parse the HTML content of the page
+soup = BeautifulSoup(html, 'html.parser')
+
+#webpage = open("bleepinghtml.txt", "r")
+#soup = BeautifulSoup(webpage.text, 'html.parser')
+
+# Find specific elements on the page
+headings = soup.find_all("h4")
+Links = soup.find_all("h4")
+subLinks = soup.css.select("h4 > a")
+authors = soup.find_all("li", {"class": "bc_news_author"})
+dates = soup.find_all("li", {"class": "bc_news_date"})
+times = soup.find_all("li", {"class": "bc_news_time"})
+
+#Remove Login element and extra links from banner headers (repeats)
+#print(headings)
+del headings[-1]
+del headings[0:8]
+
+    
+# Print the text content of each <h1> (article title) tag and remove ads
+I = 0
+o = 1
+titles = []
+subLink = []
+for heading in headings:
+    if heading.text not in titles and authors[I].text != "BleepingComputer Deals":
+        titles.append(heading.text)
+        subLink.append(subLinks[o-1])
+        print("Option " + str(o) + ": " + titles[o-1] + " - Date: " + dates[o-1].text + " " + times[o-1].text)
+        o += 1
+    I = I + 1
+
+#Maybe put a while True here...
+
+#user input to select article
+selection = input("Enter option: ")
+
+#print(subLink)
+#print(subLink[int(selection)])
+#print(len(subLink))
+
+#This shortens the subLink down to only the Link using split
+optionLink = []
+j = 0
+i = 0
+while i < int(len(subLink)):
+    run = str(subLink[i])
+    one = run.split("\"")
+    i = i + 1
+    while j < len(one):    
+        j = j + 1
+        #print(one[j])
+        optionLink.append(one[j])
+        j = j + 2
+    j = 0
+print("Link: " + optionLink[int(selection)-1])
+
+#Getting content from the sublink
+html2 = scraper.get(optionLink[int(selection)-1]).content
+soup2 = BeautifulSoup(html2, 'html.parser')
+content = soup2.find_all("div", {"class": "article_section"})
+article = str(content[0].get_text())
+article = article.split('\n')
+#print(article)
+
+#Removal of misc. items
+k = ''
+while(k in article):
+    article.remove(k)
+article.remove("0")
+del article[article.index("Related Articles:"):]
+
+for a in article:
+    if a != '' or a != '0':
+        print(a)
