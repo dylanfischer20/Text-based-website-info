@@ -44,7 +44,7 @@ subLink = []
 for heading in headings:
     if heading.text not in titles and authors[I].text != "BleepingComputer Deals":
         titles.append(heading.text)
-        subLink.append(subLinks[o-1])
+        subLink.append(subLinks[I])
         print("Option " + str(o) + ": " + titles[o-1] + " - Date: " + dates[o-1].text + " " + times[o-1].text)
         o += 1
     I = I + 1
