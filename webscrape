@@ -90,5 +90,5 @@ article.remove("0")
 del article[article.index("Related Articles:"):]
 
 for a in article:
-    if a != '' or a != '0':
+    if len(a) > 2:
         print(a)
